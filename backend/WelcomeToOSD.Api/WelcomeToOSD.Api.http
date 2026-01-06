@@ -1,0 +1,6 @@
+@WelcomeToOSD.Api_HostAddress = http://localhost:5147
+
+GET {{WelcomeToOSD.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
