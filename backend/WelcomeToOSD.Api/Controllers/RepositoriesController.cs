@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Octokit;
 
 namespace WelcomeToOSD.Api.Controllers;
@@ -12,6 +13,7 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
     private GitHubClient _httpClient = httpClient;
 
     [HttpGet(Name = "GetAllRepositoriesByQuery")]
+    [OutputCache(Duration = 300)]
     public async Task<IActionResult> GetRepositories(string? query)
     {
         if (string.IsNullOrEmpty(query))

@@ -1,5 +1,5 @@
 {
-  "name": "frontend-nuxt",
+  "name": "frontned",
   "type": "module",
   "private": true,
   "scripts": {
@@ -10,17 +10,16 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@nuxt/eslint": "^1.12.1",
-    "@nuxt/hints": "^1.0.0-alpha.5",
-    "@nuxt/test-utils": "^3.23.0",
+    "@fontsource/roboto": "^5.2.9",
+    "@mdi/font": "^7.4.47",
     "axios": "^1.13.2",
-    "eslint": "^9.39.2",
-    "http-proxy-middleware": "^3.0.5",
     "nuxt": "^4.2.2",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@types/http-proxy-middleware": "^0.19.3"
+    "unplugin-fonts": "^1.4.0",
+    "vite-plugin-vuetify": "^2.1.2",
+    "vuetify": "^3.11.6"
   }
 }

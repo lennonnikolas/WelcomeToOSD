@@ -10,6 +10,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddHttpClient();
 
+builder.Services.AddOutputCache();
+
 // Register GitHubClient as a singleton for DI
 // Don't need any PAT or OIDC
 builder.Services.AddSingleton<GitHubClient>(sp =>
@@ -36,6 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowNuxt");
 
+app.UseOutputCache();
 // app.UseHttpsRedirection();
 
 app.UseAuthorization();
