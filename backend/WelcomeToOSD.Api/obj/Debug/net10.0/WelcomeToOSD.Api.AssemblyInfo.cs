@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WelcomeToOSD.Api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+defa9e4d0beed09682c5f7aeb9354815a318e044")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9a2b53b346a8d7e5c8e0616f6398e6ad739053de")]
 [assembly: System.Reflection.AssemblyProductAttribute("WelcomeToOSD.Api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WelcomeToOSD.Api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

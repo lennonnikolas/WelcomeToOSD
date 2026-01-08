@@ -16,6 +16,16 @@ builder.Services.AddSingleton<GitHubClient>(sp =>
     new GitHubClient(new Octokit.ProductHeaderValue("WelcomeToOSD"))
 );
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowNuxt", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -24,7 +34,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+app.UseCors("AllowNuxt");
+
+// app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
