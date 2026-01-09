@@ -1,0 +1,64 @@
+# ──────────────
+# .NET Backend
+# ──────────────
+
+# Build output
+bin/
+obj/
+
+# DLLs and executables
+*.dll
+*.exe
+*.pdb
+
+# NuGet and MSBuild cache
+*.cache
+*.cache.json
+*.nuget.dgspec.json
+*.sourcelink.json
+*.editorconfig
+
+# User-specific files
+*.user
+*.suo
+*.log
+
+# Visual Studio / Rider / VS Code
+.vscode/
+.idea/
+
+# ──────────────
+# Nuxt Frontend
+# ──────────────
+
+# Node modules and build output
+node_modules/
+dist/
+.nitro/
+.output/
+
+# Nuxt dev server cache
+.nuxt/
+*.tsbuildinfo
+
+# Environment and config
+.env
+.env.*
+*.local
+
+# ──────────────
+# General
+# ──────────────
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Optional: lockfiles (if you want to ignore them)
+# yarn.lock
+# package-lock.json
+
+# Optional: logs and temp
+npm-debug.log*
+*.log
+*.tmp

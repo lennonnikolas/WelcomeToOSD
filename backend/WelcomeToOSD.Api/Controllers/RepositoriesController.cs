@@ -10,11 +10,11 @@ namespace WelcomeToOSD.Api.Controllers;
 [Route("[controller]")]
 public class RepositoriesController(GitHubClient httpClient) : ControllerBase
 {
-    private GitHubClient _httpClient = httpClient;
+    private readonly GitHubClient _httpClient = httpClient;
 
     [HttpGet(Name = "GetAllRepositoriesByQuery")]
     [OutputCache(Duration = 300)]
-    public async Task<IActionResult> GetRepositories(string? query)
+    public async Task<IActionResult> GetRepositories([FromQuery] int page, [FromQuery] int perPage, [FromQuery] string? query)
     {
         if (string.IsNullOrEmpty(query))
             return BadRequest(new { error = "Query is required for proper search"});
@@ -22,10 +22,13 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
         var request = new SearchRepositoriesRequest(query)
         {
             SortField = RepoSearchSort.Stars,
-            Order = SortDirection.Descending
+            Order = SortDirection.Descending,
+            Page = page,
+            PerPage = perPage
         };
 
         var result = await _httpClient.Search.SearchRepo(request);
+        
         return Ok(result.Items);
     }
 }
