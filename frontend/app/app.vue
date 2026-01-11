@@ -13,7 +13,11 @@
       </v-app-bar>
       <v-navigation-drawer app>
         <v-list>
-          <v-list-item title="Navigation drawer"></v-list-item>
+          <v-list-item title="Home" />
+          <v-list-item title="Repositories" />
+          <v-list-item title="Contribute" />
+          <v-list-item title="Learn more" />
+          <v-list-item title="About Us" />
         </v-list>
       </v-navigation-drawer>
 

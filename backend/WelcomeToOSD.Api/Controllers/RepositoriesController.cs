@@ -14,12 +14,9 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
 
     [HttpGet(Name = "GetAllRepositoriesByQuery")]
     [OutputCache(Duration = 300)]
-    public async Task<IActionResult> GetRepositories([FromQuery] int page, [FromQuery] int perPage, [FromQuery] string? query)
+    public async Task<IActionResult> GetRepositories(int page = 1, int perPage = 20)
     {
-        if (string.IsNullOrEmpty(query))
-            return BadRequest(new { error = "Query is required for proper search"});
-
-        var request = new SearchRepositoriesRequest(query)
+        var beginnerReposRequest = new SearchRepositoriesRequest("is:public archived:false good-first-issues:>0")
         {
             SortField = RepoSearchSort.Stars,
             Order = SortDirection.Descending,
@@ -27,9 +24,28 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
             PerPage = perPage
         };
 
-        var result = await _httpClient.Search.SearchRepo(request);
-        
-        return Ok(result.Items);
+        // Sneaky to get high starred and highly sought after repos
+        var highStarredReposRequest = new SearchRepositoriesRequest("is:public archived:false")
+        {
+            SortField = RepoSearchSort.Stars,
+            Order = SortDirection.Descending
+        };
+
+        var beginnerRepoResultsTask = _httpClient.Search.SearchRepo(beginnerReposRequest);
+        var highStarredReposResultsTask = _httpClient.Search.SearchRepo(highStarredReposRequest);
+        await Task.WhenAll(beginnerRepoResultsTask, highStarredReposResultsTask);
+
+        var beginnerResults = beginnerRepoResultsTask.Result.Items;
+        var highStarredResults = highStarredReposResultsTask.Result.Items;
+
+        var mergedResults = beginnerResults
+            .Concat(highStarredResults)
+            .GroupBy(repository => repository.FullName)
+            .Select(repository => repository.FirstOrDefault())
+            .OrderByDescending(repository => repository?.StargazersCount)
+            .ToList();
+
+        return Ok(mergedResults);
     }
 
     [HttpGet("{owner}/{repositoryName}")]
@@ -77,5 +93,12 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
             );
         
         return Ok(fullResults);
+    }
+
+    [HttpGet("{owner}/{repositoryName}/contents/{filePath}")]
+    public async Task<IActionResult> GetFileContents(string owner, string repositoryName, string filePath)
+    {
+        var fileContent = await _httpClient.Repository.Content.GetRawContent(owner, repositoryName, filePath);
+        return Ok();
     }
 }

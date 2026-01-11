@@ -127,7 +127,6 @@
 
     onMounted(async () => {
         const result = await $api.get(`/repositories/${query.owner}/${repoName}`);
-        console.log('result', result.data);
         repository.value = result.data;        
     });
 </script>

@@ -1,6 +1,9 @@
 <template>
     <v-container>
-        <div class="text-h2 text-center mb-6">Github Repositories</div>
+        <div>
+            <div class="text-h2 mb-6">Github Repositories</div>
+            <v-text-field label="Search Repositories" prepend-inner-icon="mdi-magnify" />
+        </div>
         <template v-if="loading">
             <v-row v-if="loading">
                 <v-col
@@ -27,7 +30,17 @@
                         class="h-100 d-flex flex-column pa-4"
                         elevation="2"
                     >
-                    <v-card-title class="text-h5">{{ repo.name }}</v-card-title>
+                    <v-card-title class="d-flex align-center">
+                        <span class="text-h6 flex-grow-1 text-truncate">{{ repo.name }}</span>
+                            <v-chip
+                                v-if="getStatusOfRepo(repo)"
+                                :color="getStatusOfRepo(repo).color" 
+                                variant="flat"
+                                size="small"
+                            >
+                                {{ getStatusOfRepo(repo).label }}
+                            </v-chip>
+                    </v-card-title>
                     <v-card-subtitle>
                         <a :href="repo.htmlUrl" target="_blank" rel="noopener noreferrer">
                             {{ repo.htmlUrl }}
@@ -35,24 +48,32 @@
                     </v-card-subtitle>
                     <v-divider class="my-2" />
                     <v-card-text class="flex-grow-1">{{ repo.description }}</v-card-text>
-                    <v-card-actions>
-                        <v-btn 
-                            variant="outlined"
-                            append-icon="$next"
-                            spaced="end"
-                            :to="`/repositories/${repo.name}?owner=${repo.owner.login}`"
-                        >
-                            <span>View</span>
-                        </v-btn>
+                    <v-card-actions class="d-flex justify-space-between">
+                        <div>
+                            <v-btn 
+                                variant="outlined"
+                                append-icon="$next"
+                                spaced="end"
+                                :to="`/repositories/${repo.name}?owner=${repo.owner.login}`"
+                            >
+                                <span>View</span>
+                            </v-btn>
+                        </div>
+                        <v-chip-group>
+                            <v-chip variant="plain" text-color="white">
+                                <template #prepend>
+                                    <v-icon size="16" color="yellow" class="me-1 align-center">mdi-star</v-icon>
+                                </template>
+                                {{ repo.stargazersCount }}
+                            </v-chip>
+                            <v-chip prepend-icon="mdi-eye" variant="plain">{{ repo.watchersCount }}</v-chip>
+                            <v-chip prepend-icon="mdi-clock" variant="plain">{{ convertUTCToLocal(repo.updatedAt) }}</v-chip>
+                        </v-chip-group>
                     </v-card-actions>
                     </v-card>
                 </v-col>
             </v-row>
-            <v-pagination
-            v-model="page"
-            :length="50"
-            rounded="0"
-            ></v-pagination>
+            <v-pagination v-model="page" :length="50" rounded="0" />
         </template>
     </v-container>
 </template>
@@ -71,8 +92,7 @@
 
     async function fetchRepositories() {
         loading.value = true;
-        const response = await $api.get(`/repositories?page=${page.value}&perPage=${perPage.value}&query=license:apache-2.0 is:public archived:false`);
-        console.log(response.data);
+        const response = await $api.get(`/repositories?page=${page.value}&perPage=${perPage.value}`);
         repositories.value = response.data;
         loading.value = false;
     }
@@ -88,4 +108,27 @@
         page.value = newValue;
         fetchRepositories();
     });
+
+    function getStatusOfRepo(repo) {
+        if (repo.archived)
+            return { label: 'ARCHIVED', color: 'orange-darken-2'};
+
+        const description = repo.description?.toLowerCase() || '';
+
+        if (description.includes('deprecated'))
+            return { label: 'DEPRECATED', color: 'red-darken-2'};
+        else if (description.toLowerCase().includes('unmaintained'))
+            return { label: 'UNMAINTAINED', color: 'grey-darken-2'}
+        else
+            return { label: 'MAINTAINED', color: 'green-darken-2' };
+    }
+
+    function convertUTCToLocal(datetime) {
+        const localDate = new Date(datetime); // Automatically converts to local time
+
+        return new Intl.DateTimeFormat(undefined, {
+            dateStyle: 'medium',
+            timeStyle: 'short',
+        }).format(localDate);
+    }
 </script>
