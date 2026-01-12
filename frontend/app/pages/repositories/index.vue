@@ -2,7 +2,7 @@
     <v-container>
         <div>
             <div class="text-h2 mb-6">Github Repositories</div>
-            <v-text-field label="Search Repositories" prepend-inner-icon="mdi-magnify" />
+            <v-text-field label="Search Repositories" prepend-inner-icon="mdi-magnify" v-model="repoInput"/>
         </div>
         <template v-if="loading">
             <v-row v-if="loading">
@@ -20,7 +20,7 @@
         <template v-else>
             <v-row>
                 <v-col
-                    v-for="repo in repositories"
+                    v-for="repo in filteredRepositories"
                     :key="repo.id"
                     class="mb-4"
                     cols="12"
@@ -79,6 +79,8 @@
 </template>
 
 <script setup>
+    import { defineModel } from 'vue';
+
     definePageMeta({
         ssr: false
     });
@@ -89,6 +91,7 @@
     const page = ref(1);
     const perPage = ref(20);
     const loading = ref(true);
+    const repoInput = ref("");
 
     async function fetchRepositories() {
         loading.value = true;
@@ -107,6 +110,15 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
         page.value = newValue;
         fetchRepositories();
+    });
+
+    const filteredRepositories = computed(() => {
+        const query = repoInput.value.toLowerCase();
+
+        if (query === "")
+            return repositories.value;
+
+        return repositories.value.filter(repo => repo.fullName.toLowerCase().includes(query));
     });
 
     function getStatusOfRepo(repo) {

@@ -24,13 +24,15 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
             PerPage = perPage
         };
 
-        // Sneaky to get high starred and highly sought after repos
         var highStarredReposRequest = new SearchRepositoriesRequest("is:public archived:false")
         {
             SortField = RepoSearchSort.Stars,
             Order = SortDirection.Descending
         };
 
+        // There is an issue here with not fetching all at once. Now when we get page 2, they aren't completely sorted
+        // meaning that the second list will have higher stargzers count than the last item in the first list.
+        // to fix this we need to fetch ALL (up to the Github 1000 repo) limit.
         var beginnerRepoResultsTask = _httpClient.Search.SearchRepo(beginnerReposRequest);
         var highStarredReposResultsTask = _httpClient.Search.SearchRepo(highStarredReposRequest);
         await Task.WhenAll(beginnerRepoResultsTask, highStarredReposResultsTask);
@@ -41,6 +43,7 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
         var mergedResults = beginnerResults
             .Concat(highStarredResults)
             .GroupBy(repository => repository.FullName)
+            .Distinct()
             .Select(repository => repository.FirstOrDefault())
             .OrderByDescending(repository => repository?.StargazersCount)
             .ToList();
