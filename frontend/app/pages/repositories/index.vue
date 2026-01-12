@@ -69,6 +69,7 @@
                             <v-chip prepend-icon="mdi-eye" variant="plain">{{ repo.watchersCount }}</v-chip>
                             <v-chip prepend-icon="mdi-clock" variant="plain">{{ convertUTCToLocal(repo.updatedAt) }}</v-chip>
                         </v-chip-group>
+                        <v-avatar v-if="repo.owner.avatarUrl" :image="repo.owner.avatarUrl" />
                     </v-card-actions>
                     </v-card>
                 </v-col>
