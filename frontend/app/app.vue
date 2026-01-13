@@ -2,7 +2,7 @@
   <NuxtLayout>
     <v-app :theme="theme">
       <v-app-bar title="CodeCommons" app>
-        <v-spacer></v-spacer>
+        <v-spacer />
         <v-btn 
           :prepend-icon="theme === 'light' ? 'mdi-weather-sunny': 'mdi-weather-night'"
           text="Toggle Theme"

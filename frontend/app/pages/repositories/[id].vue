@@ -33,22 +33,62 @@
                 <v-col>
                     <v-chip-group>
                         <v-chip prepend-icon="mdi-star">
-                            Stars
+                            {{ repository.stargazersCount }}
                         </v-chip>
                         <v-chip prepend-icon="mdi-source-fork">
-                            Forks
+                            {{ repository.forksCount }}
                         </v-chip>
                     </v-chip-group>
                 </v-col>
             </v-row>
         </v-container>
-        <v-sheet>
-            Hello
-        </v-sheet>
+        <v-divider />
+        <v-container>
+            <v-row>
+                <v-col cols="12" md="8">
+                    <v-tabs color="primary" v-model="tab">
+                        <v-tab value="one">README</v-tab>
+                        <v-tab value="two">Issues</v-tab>
+                        <v-tab value="three">Insights</v-tab>
+                    </v-tabs>
+                    <v-divider />
+                    <v-tabs-window v-model="tab">
+                        <v-tabs-window-item value="one">
+                            <v-card class="pa-5" style="height: 600px; overflow-y: auto;">
+                                <MDCRenderer v-if="readmeMarkdown" :body="readmeMarkdown.body" :data="readmeMarkdown.data" />
+                            </v-card>
+                        </v-tabs-window-item>
+                        <v-tabs-window-item value="two">
+                            <v-sheet class="pa-5" color="orange">Two</v-sheet>
+                        </v-tabs-window-item>
+                        <v-tabs-window-item value="three">
+                            <v-sheet class="pa-5" color="brown">Three</v-sheet>
+                        </v-tabs-window-item>
+                    </v-tabs-window>
+                </v-col>
+                <v-col cols="12" md="4">
+                    <v-container>
+                        <v-card>
+                            <v-card-title>MIT License</v-card-title>
+                            <v-divider></v-divider>
+                        </v-card>
+                        <v-card>
+                            <v-card-title>Languages</v-card-title>
+                            <div v-for="language in languages.languages">
+                                <span>{{ language.name }}</span>
+                                <v-progress-linear :model-value="computeLengthOfLanguage(language)" height="3" />
+                            </div>
+                        </v-card>
+                    </v-container>
+                </v-col>
+            </v-row>
+        </v-container>
     </v-sheet>
 </template>
 
 <script setup>
+    import { parseMarkdown } from '@nuxtjs/mdc/runtime';
+
     definePageMeta({
         ssr: false
     });
@@ -63,6 +103,20 @@
         license: {}
     });
 
+    const languages = ref({
+        languages: [],
+        totalBytes: 0
+    });
+
+    const readmeMarkdown = ref(null);
+
+    function computeLengthOfLanguage(recievedLanguage) {
+        console.log('recievedLanguage', recievedLanguage);
+        const value = recievedLanguage.numberOfBytes / languages.value.totalBytes * 100;
+        console.log('value', value);
+        return value;
+    }
+
     const languageIcon = computed(() => {
         //handle edge cases
         let lowerCaseLanguage = repository.value?.language?.toLowerCase() ?? 'javascript';
@@ -74,7 +128,17 @@
     });
 
     onMounted(async () => {
-        const result = await $api.get(`/repositories/${query.owner}/${repoName}`);
-        repository.value = result.data;        
+        const repositoryResult = await $api.get(`/repositories/${query.owner}/${repoName}`);
+        const readmeResult = await $api.get(`/repositories/${query.owner}/${repoName}/contents/README.md`);
+        const languagesResult = await $api.get(`/repositories/${query.owner}/${repoName}/languages`);
+
+        const totalNumberOfBytesOfLanguages = languagesResult.data.map(language => language.numberOfBytes).reduce((acc, current) => acc + current );
+        languages.value.languages = languagesResult.data;
+        languages.value.totalBytes = totalNumberOfBytesOfLanguages;
+
+        console.log('languages', languages.value);
+
+        repository.value = repositoryResult.data;
+        readmeMarkdown.value = await parseMarkdown(readmeResult.data);
     });
 </script>

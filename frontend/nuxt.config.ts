@@ -6,6 +6,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   // modules: ['@nuxt/eslint', '@nuxt/hints', '@nuxt/test-utils'],
   plugins: ['~/plugins/axios'],
+  modules: ['@nuxtjs/mdc'],
   build: {
     transpile: ['vuetify']
   },

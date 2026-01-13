@@ -12,6 +12,7 @@
   "dependencies": {
     "@fontsource/roboto": "^5.2.9",
     "@mdi/font": "^7.4.47",
+    "@nuxtjs/mdc": "^0.19.2",
     "axios": "^1.13.2",
     "nuxt": "^4.2.2",
     "vue": "^3.5.26",

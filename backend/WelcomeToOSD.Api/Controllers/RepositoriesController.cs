@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -99,9 +100,20 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
     }
 
     [HttpGet("{owner}/{repositoryName}/contents/{filePath}")]
+    [OutputCache(Duration = 600)]
     public async Task<IActionResult> GetFileContents(string owner, string repositoryName, string filePath)
     {
         var fileContent = await _httpClient.Repository.Content.GetRawContent(owner, repositoryName, filePath);
-        return Ok();
+        var actualContent = Encoding.UTF8.GetString(fileContent);
+
+        return Ok(actualContent);
+    }
+
+    [HttpGet("{owner}/{repositoryName}/languages")]
+    [OutputCache(Duration = 600)]
+    public async Task<IActionResult> GetRepositoryLanguages(string owner, string repositoryName)
+    {
+        var languages = await _httpClient.Repository.GetAllLanguages(owner, repositoryName);
+        return Ok(languages);
     }
 }
