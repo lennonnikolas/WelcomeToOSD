@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Octokit;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +18,16 @@ builder.Services.AddOutputCache();
 // Register GitHubClient as a singleton for DI
 // Don't need any PAT or OIDC
 builder.Services.AddSingleton<GitHubClient>(sp =>
-    new GitHubClient(new Octokit.ProductHeaderValue("WelcomeToOSD"))
+    {
+        var client = new GitHubClient(new Octokit.ProductHeaderValue("WelcomeToOSD"))
+        {
+            Credentials = new Credentials(
+                Environment.GetEnvironmentVariable("GITHUB_TOKEN")
+            )
+        };
+        
+        return client;
+    }
 );
 
 builder.Services.AddCors(options =>
@@ -27,6 +39,19 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+
+builder.Services.AddAuthentication("Bearer")
+    .AddJwtBearer("Beaer", options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? ""))
+        };
+    });
 
 var app = builder.Build();
 
@@ -41,6 +66,7 @@ app.UseCors("AllowNuxt");
 app.UseOutputCache();
 // app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

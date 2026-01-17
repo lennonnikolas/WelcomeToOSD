@@ -80,8 +80,6 @@
 </template>
 
 <script setup>
-    import { defineModel } from 'vue';
-
     definePageMeta({
         ssr: false
     });

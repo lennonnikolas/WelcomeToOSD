@@ -4,8 +4,12 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Octokit;
+using WelcomeToOSD.Api.DTOs;
 
 namespace WelcomeToOSD.Api.Controllers;
+
+// TODO: Need to create DTOs for these returns because Octokit isn't meant to be 
+// explicitly returned without mapping. An example being the Issues API.
 
 [ApiController]
 [Route("[controller]")]
@@ -115,5 +119,39 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
     {
         var languages = await _httpClient.Repository.GetAllLanguages(owner, repositoryName);
         return Ok(languages);
+    }
+
+    [HttpGet("{owner}/{repositoryName}/issues")]
+    [OutputCache(Duration = 300)]
+    public async Task<IActionResult> GetRepositoryIssues(string owner, string repositoryName)
+    {
+        try
+        {
+            var issues = await _httpClient.Issue.GetAllForRepository(owner, repositoryName);
+            var issuesDto = issues.Select(issue => new IssueDto
+            {            
+                Id = issue.Id,
+                Number = issue.Number,
+                HtmlUrl = issue.HtmlUrl,
+                State = issue.State.StringValue,
+                Title = issue.Title,
+                Body = issue.Body,
+                PullRequest = new PullRequestDto { HtmlUrl = issue.PullRequest.HtmlUrl },
+                Comments = issue.Comments,
+                Labels = issue.Labels.Select(label => 
+                    new LabelDto 
+                    { 
+                        Description = label.Description,
+                        Id = label.Id,
+                        Name = label.Name
+                    })
+            });
+
+            return Ok(issuesDto);
+        } catch (Exception ex)
+        {
+           throw new Exception($"Exception occurred {ex.Message}"); 
+        }
+
     }
 }

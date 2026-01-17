@@ -66,6 +66,7 @@
                         </v-tabs-window-item>
                     </v-tabs-window>
                 </v-col>
+                <v-divider vertical />
                 <v-col cols="12" md="4">
                     <v-container>
                         <v-card>
@@ -74,10 +75,10 @@
                         </v-card>
                         <v-card>
                             <v-card-title>Languages</v-card-title>
-                            <div v-for="language in languages.languages">
+                            <v-container v-for="language in languages.languages">
                                 <span>{{ language.name }}</span>
                                 <v-progress-linear :model-value="computeLengthOfLanguage(language)" height="3" />
-                            </div>
+                            </v-container>
                         </v-card>
                     </v-container>
                 </v-col>

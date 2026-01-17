@@ -24,8 +24,15 @@
       <v-main app>
         <v-container class="flex-grow-1">
           <NuxtPage />
+          
         </v-container>
       </v-main>
+      <v-btn
+        class="fab"
+        icon="mdi-arrow-up"
+        size="large"
+        @click="scrollToTop"
+      />
 
       <!-- TODO: Fix this footer from not being sticky or figure something else out -->
       <!-- <v-footer class="text-end" app>
@@ -33,14 +40,29 @@
       </v-footer> -->
     </v-app>
   </NuxtLayout>
+  
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref } from 'vue';
 
-  const theme = ref('light')
+  const theme = ref('light');
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   function onThemeClick () {
     theme.value = theme.value === 'light' ? 'dark' : 'light'
   }
 </script>
+
+<style>
+  .fab {
+    position: fixed !important;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+  }
+
+</style>
