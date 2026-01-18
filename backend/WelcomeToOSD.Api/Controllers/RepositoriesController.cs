@@ -128,22 +128,24 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
         try
         {
             var issues = await _httpClient.Issue.GetAllForRepository(owner, repositoryName);
-            var issuesDto = issues.Select(issue => new IssueDto
+            var issuesDto = issues?.Select(issue => new IssueDto
             {            
                 Id = issue.Id,
                 Number = issue.Number,
-                HtmlUrl = issue.HtmlUrl,
-                State = issue.State.StringValue,
-                Title = issue.Title,
-                Body = issue.Body,
-                PullRequest = new PullRequestDto { HtmlUrl = issue.PullRequest.HtmlUrl },
+                HtmlUrl = issue.HtmlUrl ?? "",
+                State = issue.State.StringValue ?? "",
+                Title = issue.Title ?? "",
+                Body = issue.Body ?? "",
+                PullRequest = issue.PullRequest != null 
+                    ? new PullRequestDto { HtmlUrl = issue.PullRequest.HtmlUrl ?? "" } 
+                    : null,
                 Comments = issue.Comments,
-                Labels = issue.Labels.Select(label => 
+                Labels = issue.Labels?.Select(label => 
                     new LabelDto 
                     { 
-                        Description = label.Description,
+                        Description = label.Description ?? "",
                         Id = label.Id,
-                        Name = label.Name
+                        Name = label.Name ?? ""
                     })
             });
 
