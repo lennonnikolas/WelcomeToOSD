@@ -150,7 +150,8 @@ public class RepositoriesController(GitHubClient httpClient) : ControllerBase
             });
 
             return Ok(issuesDto);
-        } catch (Exception ex)
+        } 
+        catch (Exception ex)
         {
            throw new Exception($"Exception occurred {ex.Message}"); 
         }

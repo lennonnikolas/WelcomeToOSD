@@ -11,9 +11,13 @@
 
         <!-- Hero Section header-->
         <v-container>
-            <v-row class="d-flex">
-                <v-col>
-                    <v-card>
+            <v-row no-gutters>
+                <v-col cols="8">
+                    <v-sheet class="d-flex">
+                        <!-- <v-avatar :image="repository.owner.avatarUrl" size="large" /> -->
+                        <h1 class="">{{ repository.fullName }}</h1>
+                    </v-sheet>
+                    <!-- <v-card>
                         <v-card-title class="text-h3">
                             <v-avatar :image="repository.owner.avatarUrl" />
                             {{ repository.fullName }}
@@ -28,21 +32,38 @@
                                 rel="noopener noreferrer"
                             />
                         </v-card-actions>
-                    </v-card>
+                    </v-card> -->
                 </v-col>
-                <v-col>
-                    <v-chip-group>
-                        <v-chip prepend-icon="mdi-star">
-                            {{ repository.stargazersCount }}
-                        </v-chip>
-                        <v-chip prepend-icon="mdi-source-fork">
-                            {{ repository.forksCount }}
-                        </v-chip>
-                    </v-chip-group>
+                <v-col cols="4">
+                    <v-sheet>
+                        <v-chip-group>
+                            <v-chip prepend-icon="mdi-star">
+                                {{ repository.stargazersCount }}
+                            </v-chip>
+                            <v-chip prepend-icon="mdi-source-fork">
+                                {{ repository.forksCount }}
+                            </v-chip>
+                        </v-chip-group>
+                    </v-sheet>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="12">
+                    <p>{{ repository.description }}</p>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col cols="4">
+                    <div class="d-flex flex-direction-row justify-space-evenly">
+                        <v-btn>GitHub</v-btn>
+                        <v-btn>Star</v-btn>
+                        <v-btn>Fork</v-btn>
+                        <v-btn>Clone</v-btn>
+                    </div>
                 </v-col>
             </v-row>
         </v-container>
-        <v-divider />
+        <!-- <v-divider /> -->
         <v-container>
             <v-row>
                 <v-col cols="12" md="8">
@@ -96,50 +117,46 @@
 
     const { $api } = useNuxtApp();
     const { path, query } = useRoute();
-    const tab = ref('option-1');
     const repoName = path?.split('/').at(2);
+
+    const tab = ref('option-1');
+    const readmeMarkdown = ref(null);
 
     const repository = ref({
         owner: {},
         license: {}
     });
 
+    const issues = ref(null);
+
     const languages = ref({
         languages: [],
         totalBytes: 0
     });
 
-    const readmeMarkdown = ref(null);
-
     function computeLengthOfLanguage(recievedLanguage) {
-        console.log('recievedLanguage', recievedLanguage);
         const value = recievedLanguage.numberOfBytes / languages.value.totalBytes * 100;
-        console.log('value', value);
         return value;
     }
 
-    const languageIcon = computed(() => {
-        //handle edge cases
-        let lowerCaseLanguage = repository.value?.language?.toLowerCase() ?? 'javascript';
-        
-        if (lowerCaseLanguage === 'c++')
-            lowerCaseLanguage = 'cpp';
-            
-        return `mdi-language-${lowerCaseLanguage}`;
-    });
-
     onMounted(async () => {
-        const repositoryResult = await $api.get(`/repositories/${query.owner}/${repoName}`);
-        const readmeResult = await $api.get(`/repositories/${query.owner}/${repoName}/contents/README.md`);
-        const languagesResult = await $api.get(`/repositories/${query.owner}/${repoName}/languages`);
+        const owner = query.owner;
 
-        const totalNumberOfBytesOfLanguages = languagesResult.data.map(language => language.numberOfBytes).reduce((acc, current) => acc + current );
+        const repositoryResult = await $api.get(`/repositories/${owner}/${repoName}`);
+        const readmeResult = await $api.get(`/repositories/${owner}/${repoName}/contents/README.md`);
+        const languagesResult = await $api.get(`/repositories/${owner}/${repoName}/languages`);
+        const issuesResult = await $api.get(`/repositories/${owner}/${repoName}/issues`);
+
+        const totalNumberOfBytesOfLanguages = languagesResult.data
+            .map(language => language.numberOfBytes)
+            .reduce((acc, current) => acc + current );
+
         languages.value.languages = languagesResult.data;
         languages.value.totalBytes = totalNumberOfBytesOfLanguages;
 
-        console.log('languages', languages.value);
-
         repository.value = repositoryResult.data;
         readmeMarkdown.value = await parseMarkdown(readmeResult.data);
+
+        issues.value = issuesResult.data;
     });
 </script>
