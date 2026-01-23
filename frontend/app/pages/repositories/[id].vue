@@ -80,7 +80,27 @@
                             </v-card>
                         </v-tabs-window-item>
                         <v-tabs-window-item value="two">
-                            <v-sheet class="pa-5" color="orange">Two</v-sheet>
+                            <v-sheet class="pa-5">
+                                <v-row dense>
+                                    <v-col 
+                                        v-for="issue in paginatedItems"
+                                        :key="issue.id"
+                                        cols="12"
+                                        md="6"
+                                    >
+                                        <v-card class="pa-4" elevation="2">
+                                            <v-card-title>{{ issue.title }}</v-card-title>
+                                            <v-card-subtitle>{{ issue.body }}</v-card-subtitle>
+                                        </v-card>
+                                    </v-col>
+                                </v-row>
+                                <v-pagination
+                                    v-model="issuesPage"
+                                    :length="pageCount"
+                                    :total-visible="7"
+                                    class="mt-6"
+                                />
+                            </v-sheet>
                         </v-tabs-window-item>
                         <v-tabs-window-item value="three">
                             <v-sheet class="pa-5" color="brown">Three</v-sheet>
@@ -127,11 +147,24 @@
         license: {}
     });
 
-    const issues = ref(null);
+    const issues = ref([]);
+    const issuesPage = ref(1);
+    const issuesPerPage = 10;
 
     const languages = ref({
         languages: [],
         totalBytes: 0
+    });
+
+    const pageCount = computed(() => {
+        Math.ceil(issues.value.length / issuesPerPage);
+    });
+
+    const paginatedItems = computed(() => {
+        const start = (issuesPage.value - 1) * issuesPerPage;
+        const value = issues.value.slice(start, start + issuesPerPage);
+        console.log('value', value);
+        return value;
     });
 
     function computeLengthOfLanguage(recievedLanguage) {
