@@ -157,13 +157,13 @@
     });
 
     const pageCount = computed(() => {
-        Math.ceil(issues.value.length / issuesPerPage);
+        return Math.ceil(issues.value.length / issuesPerPage);
     });
 
     const paginatedItems = computed(() => {
         const start = (issuesPage.value - 1) * issuesPerPage;
         const value = issues.value.slice(start, start + issuesPerPage);
-        console.log('value', value);
+
         return value;
     });
 
