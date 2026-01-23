@@ -80,27 +80,33 @@
                             </v-card>
                         </v-tabs-window-item>
                         <v-tabs-window-item value="two">
-                            <v-sheet class="pa-5">
+                            <v-container class="pa-5">
                                 <v-row dense>
                                     <v-col 
                                         v-for="issue in paginatedItems"
                                         :key="issue.id"
                                         cols="12"
-                                        md="6"
                                     >
-                                        <v-card class="pa-4" elevation="2">
-                                            <v-card-title>{{ issue.title }}</v-card-title>
+                                        <v-card class="pa-6" elevation="2">
+                                            <v-card-title class="text-h5 d-flex justify-space-between align-items-center">
+                                                <span>{{ issue.title }}</span>
+                                                <v-icon size="24">mdi-open-in-new</v-icon>
+                                            </v-card-title>
                                             <v-card-subtitle>{{ issue.body }}</v-card-subtitle>
+                                            <v-divider />
+                                            <v-card-actions>
+                                                <v-btn>Read More</v-btn>
+                                            </v-card-actions>
                                         </v-card>
                                     </v-col>
                                 </v-row>
                                 <v-pagination
                                     v-model="issuesPage"
                                     :length="pageCount"
-                                    :total-visible="7"
+                                    :total-visible=5
                                     class="mt-6"
                                 />
-                            </v-sheet>
+                            </v-container>
                         </v-tabs-window-item>
                         <v-tabs-window-item value="three">
                             <v-sheet class="pa-5" color="brown">Three</v-sheet>
@@ -149,7 +155,7 @@
 
     const issues = ref([]);
     const issuesPage = ref(1);
-    const issuesPerPage = 10;
+    const issuesPerPage = 5;
 
     const languages = ref({
         languages: [],
