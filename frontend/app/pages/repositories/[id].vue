@@ -190,6 +190,6 @@
         repository.value = repositoryResult.data;
         readmeMarkdown.value = await parseMarkdown(readmeResult.data);
 
-        issues.value = issuesResult.data;
+        issues.value = issuesResult.data.filter(issue => issue.pullRequest == null);
     });
 </script>
